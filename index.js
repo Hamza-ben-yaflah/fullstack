@@ -35,11 +35,41 @@ app.get("/todos", async (req, res) => {
 });
 
 // get a todo
-app.get("/todos/:todo_list", async (req, res) => {});
+app.get("/todos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const todo = await pool.query("SELECT * FROM todo WHERE todo_id = $1", [
+      id,
+    ]);
+    res.json(todo.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
 // update a todo
-
+app.put("/todos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { description } = req.body;
+    const update = await pool.query(
+      "UPDATE todo set description = $1 WHERE todo_id = $2",
+      [description, id]
+    );
+    res.json("updated");
+  } catch {}
+});
 // delete a todo
+
+app.delete("/todos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const todo = await pool.query("DELETE  FROM todo WHERE todo_id = $1", [id]);
+    res.json("was deleted");
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
 app.listen(5000, () => {
   console.log("server has started on port 5000");
